@@ -27,7 +27,7 @@ def create_hotels(title: str = Body(embed=True)):
 
 
 @app.put("/hotels/{hotel_id}")
-def full_change_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
+def put_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
     hotel["title"] = title
@@ -35,8 +35,12 @@ def full_change_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
     return {"status": "OK"}
 
 
-@app.patch("/hotels/{hotel_id}")
-def change_hotel(hotel_id: int, title: str | None = Body(None), name: str = Body(None)):
+@app.patch(
+    path="/hotels/{hotel_id}",
+    summary="частичное изменение данных отеля",
+    description="можете вводить не все поля для изменения"
+)
+def patch_hotel(hotel_id: int, title: str | None = Body(None), name: str = Body(None)):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
     if title:
@@ -51,11 +55,6 @@ def delete_hotel(hotel_id: int):
     global hotels
     hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
     return {"status": "OK"}
-
-
-@app.get("/")
-def func():
-    return "Hello12!"
 
 
 if __name__ == "__main__":
