@@ -9,7 +9,11 @@ hotels = [
 ]
 
 
-@app.get("/hotels")
+@app.get(
+    path="/hotels",
+    summary="получение списка отелей",
+    description="получение списка отелей по введенным данным",
+)
 def get_hotels(
         id: int | None = Query(None, description="айдишник"),
         title: str | None = Query(None, description="название")
@@ -17,7 +21,11 @@ def get_hotels(
     return [hotel for hotel in hotels if not (id and hotel["id"] != id or title and hotel["title"] != title)]
 
 
-@app.post("/hotels")
+@app.post(
+    path="/hotels",
+    summary="добавление отеля",
+    description="будет добавлен новый отель",
+)
 def create_hotels(title: str = Body(embed=True)):
     global hotels
     hotels.append({"id": hotels[-1]["id"] + 1,
@@ -26,7 +34,11 @@ def create_hotels(title: str = Body(embed=True)):
     return {"status": "OK"}
 
 
-@app.put("/hotels/{hotel_id}")
+@app.put(
+    path="/hotels/{hotel_id}",
+    summary="полное изменение данных отеля",
+    description="будут изменены все поля отеля",
+)
 def put_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
@@ -38,7 +50,7 @@ def put_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
 @app.patch(
     path="/hotels/{hotel_id}",
     summary="частичное изменение данных отеля",
-    description="можете вводить не все поля для изменения"
+    description="можете вводить не все поля для изменения",
 )
 def patch_hotel(hotel_id: int, title: str | None = Body(None), name: str = Body(None)):
     global hotels
@@ -50,7 +62,11 @@ def patch_hotel(hotel_id: int, title: str | None = Body(None), name: str = Body(
     return {"status": "OK"}
 
 
-@app.delete("/hotels/{hotel_id}")
+@app.delete(
+    path="/hotels/{hotel_id}",
+    summary="удаление отеля",
+    description="удаление отеля по его идентификатору",
+)
 def delete_hotel(hotel_id: int):
     global hotels
     hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
