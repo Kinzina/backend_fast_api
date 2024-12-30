@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Query, Body
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 
 from src.db import async_session_maker, engine
 from src.models.hotels import HotelsOrm
@@ -25,9 +25,9 @@ async def get_hotels(
     async with async_session_maker() as session:
         query = select(HotelsOrm)
         if title:
-            query = query.where(HotelsOrm.title.like(f'%{title}%'))
+            query = query.filter(func.lower(HotelsOrm.title).like(f'%{title.strip().lower()}%'))
         if location:
-            query = query.where(HotelsOrm.location.like(f'%{location}%'))
+            query = query.filter(func.lower(HotelsOrm.location).like(f'%{location.strip().lower()}%'))
         query = (
             query
             .limit(limit=per_page)
@@ -35,8 +35,9 @@ async def get_hotels(
         )
         result = await session.execute(query)
         hotels = result.scalars().all()
-        print(hotels)
+        # print(query.compile(engine, compile_kwargs={"literal_binds": True}))
         return hotels
+
 
 @router.post(
     path="",
@@ -44,11 +45,12 @@ async def get_hotels(
     description="будет добавлен новый отель",
 )
 async def create_hotels(hotel_data: Hotel = Body(
-    openapi_examples={"1": {"summary": "sochi", "value": {"title": "Отель_01", "location": "г. Сочи, ул. Герцена, д. 1"}},
-                      "2": {"summary": "yalta", "value": {"title": "Отель_01", "location": "г. Ялта, ул. Герцена, д. 1"}}})):
+    openapi_examples={
+        "1": {"summary": "sochi", "value": {"title": "Отель_01", "location": "г. Сочи, ул. Герцена, д. 1"}},
+        "2": {"summary": "yalta", "value": {"title": "Отель_01", "location": "г. Ялта, ул. Герцена, д. 1"}}})):
     async with async_session_maker() as session:
         add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
+        # print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         await session.execute(add_hotel_stmt)
         await session.commit()
 
