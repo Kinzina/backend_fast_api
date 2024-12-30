@@ -1,6 +1,5 @@
+from pydantic import BaseModel
 from sqlalchemy import select, insert
-
-from src.schemas.hotels import Hotel
 
 
 class BaseRepository:
@@ -19,8 +18,8 @@ class BaseRepository:
         result = await self.session.execute(query)
         return result.scalars().one_or_none()
 
-    async def add(self, title, location):
-        stmt = insert(self.model).values(title=title, location=location)
+    async def add(self, data: BaseModel):
+        add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         # printstmt.compile(engine, compile_kwargs={"literal_binds": True}))
-        await self.session.execute(stmt)
-        return Hotel(title=title, location=location)
+        result = await self.session.execute(add_data_stmt)
+        return result.scalars().one()
