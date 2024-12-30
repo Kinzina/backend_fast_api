@@ -13,7 +13,6 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
     path="",
     summary="получение списка отелей",
     description="получение списка отелей по введенным данным",
-    # response_model=list[Hotel]
 )
 async def get_hotels(
         pagination: PaginationDep,
@@ -51,11 +50,19 @@ async def create_hotels(hotel_data: Hotel = Body(
     summary="полное изменение данных отеля",
     description="будут изменены все поля отеля",
 )
-def put_hotel(hotel_id: int, hotel_data: Hotel):
-    global hotels
-    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
-    hotel["title"] = hotel_data.title
-    hotel["name"] = hotel_data.name
+async def put_hotel(
+        hotel_id: int,
+        hotel_data: Hotel = Body(
+            openapi_examples={
+                "1": {"summary": "sochi", "value": {"title": "Отель_01", "location": "г. Сочи, ул. Герцена, д. 1"}},
+                "2": {"summary": "yalta", "value": {"title": "Отель_01", "location": "г. Ялта, ул. Герцена, д. 1"}}
+            }
+        )
+):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, id=hotel_id)
+        await session.commit()
+
     return {"status": "OK"}
 
 
@@ -79,7 +86,9 @@ def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
     summary="удаление отеля",
     description="удаление отеля по его идентификатору",
 )
-def delete_hotel(hotel_id: int):
-    global hotels
-    hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
+async def delete_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete(id=hotel_id)
+        await session.commit()
+
     return {"status": "OK"}
