@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import Query, Body
 
 from src.db import async_session_maker
-from src.schemas.hotels import Hotel, HotelPATCH
+from src.schemas.hotels import HotelAdd, HotelPATCH
 from src.api.dependencies import PaginationDep
 from src.repositories.hotels import HotelsRepository
 
@@ -44,7 +44,7 @@ async def get_hotel_by_id(hotel_id: int):
     summary="добавление отеля",
     description="будет добавлен новый отель",
 )
-async def create_hotels(hotel_data: Hotel = Body(
+async def create_hotels(hotel_data: HotelAdd = Body(
     openapi_examples={
         "1": {"summary": "sochi", "value": {"title": "Отель_01", "location": "г. Сочи, ул. Герцена, д. 1"}},
         "2": {"summary": "yalta", "value": {"title": "Отель_01", "location": "г. Ялта, ул. Герцена, д. 1"}}})):
@@ -62,7 +62,7 @@ async def create_hotels(hotel_data: Hotel = Body(
 )
 async def put_hotel(
         hotel_id: int,
-        hotel_data: Hotel = Body(
+        hotel_data: HotelAdd = Body(
             openapi_examples={
                 "1": {"summary": "sochi", "value": {"title": "Отель_01", "location": "г. Сочи, ул. Герцена, д. 1"}},
                 "2": {"summary": "yalta", "value": {"title": "Отель_01", "location": "г. Ялта, ул. Герцена, д. 1"}}
