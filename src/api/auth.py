@@ -1,6 +1,6 @@
 from datetime import datetime, timezone, timedelta
 
-from fastapi import APIRouter, Body, HTTPException, Response
+from fastapi import APIRouter, Body, HTTPException, Response, Request
 from passlib.context import CryptContext
 import jwt
 
@@ -11,14 +11,6 @@ from src.config import settings
 from src.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Аутентификация и авторизация"])
-
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-#
-#
-# def verify_password(plain_password, hashed_password):
-#     return pwd_context.verify(plain_password, hashed_password)
-
-
 
 
 @router.post("/register")
@@ -54,3 +46,9 @@ async def login_user(
         await session.commit()
         response.set_cookie("access_token", access_token)
         return {"access_token": access_token}
+
+
+@router.get("/only_auth")
+async def only_auth(request: Request):
+    access_token = request.cookies["access_token"] or None
+    return {"access_token": access_token}
