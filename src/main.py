@@ -12,8 +12,8 @@ from src.api.rooms import router as router_rooms
 
 app = FastAPI()
 app.include_router(router=router_auth)
-app.include_router(router=router_rooms)
 app.include_router(router=router_hotels)
+app.include_router(router=router_rooms)
 
 
 if __name__ == "__main__":
