@@ -10,6 +10,7 @@ https://github.com/Kinzina/backend_fast_api/commit/3b893b869565e66d055c1e8dbc80b
 https://github.com/Kinzina/backend_fast_api/commit/045a691b194a1da5ea51d0798b42966696f121e9 = task_09
 https://github.com/Kinzina/backend_fast_api/commit/8f0ec6854a7119fc1f7102dce171e21d0903c776 = task_10
 https://github.com/Kinzina/backend_fast_api/commit/0513627ba32ff0a7182c9b122c67a96d703f3735 = task_11
+https://github.com/Kinzina/backend_fast_api/commit/ = task_12
 
 pip install -r requirements.txt
 pip freeze > requirements.txt
