@@ -18,11 +18,3 @@ class BookingAdd(BaseModel):
 
 class Booking(BookingAdd):
     id: int
-
-
-class BookingPatchRequest(BaseModel):
-    pass
-
-
-class BookingPatch(BaseModel):
-    pass
