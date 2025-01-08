@@ -10,26 +10,6 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
 @router.get(
-    path="/all",
-    summary="получение списка отелей",
-    description="получение списка отелей по введенным данным",
-)
-async def get_all_hotels(
-        pagination: PaginationDep,
-        db: DBDep,
-        title: str | None = Query(None, description="название"),
-        location: str | None = Query(None, description="местонахождение"),
-):
-    per_page = pagination.per_page or 5
-    return await db.hotels.get_all(
-        title=title,
-        location=location,
-        limit=per_page,
-        offset=per_page * (pagination.page - 1),
-    )
-
-
-@router.get(
     path="",
     summary="получение списка отелей со свободными номерами",
     description="получение списка отелей со свободными номерами",
@@ -43,11 +23,14 @@ async def get_hotels(
         location: str | None = Query(None, description="местонахождение"),
 ):
     per_page = pagination.per_page or 5
-    return await db.hotels.get_filtered_by_time(date_from=date_from, date_to=date_to,
-                                                title=title, location=location,
-                                                limit=per_page,
-                                                offset=per_page * (pagination.page - 1),
-                                                )
+    return await db.hotels.get_filtered_by_time(
+        date_from=date_from, date_to=date_to,
+        title=title,
+        location=location,
+        limit=per_page,
+        offset=per_page * (pagination.page - 1),
+    )
+
 
 @router.get(
     path="/{hotel_id}",
