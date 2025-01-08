@@ -24,11 +24,11 @@ async def add_booking(
 
 @router.get(path="/bookings")
 async def get_bookings(db: DBDep):
-    bookings = await db.bookings.get_filtered()
+    bookings = await db.bookings.get_all()
     return {"data": bookings}
 
 
-@router.get(path="/bookings/me")
-async def get_bookings_me(db: DBDep, user_id: UserIdDep):
+@router.get(path="/me")
+async def get_my_bookings(db: DBDep, user_id: UserIdDep):
     bookings = await db.bookings.get_filtered(user_id=user_id)
     return {"data": bookings}
