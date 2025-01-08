@@ -7,7 +7,7 @@ router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
 @router.post(path="")
-async def get_smth(
+async def add_booking(
         db: DBDep,
         user_id: UserIdDep,
         booking_data: BookingAddRequest = Body(openapi_examples={
@@ -16,8 +16,19 @@ async def get_smth(
             }}
         })):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
-    boooking_price = room.price * (booking_data.date_to - booking_data.date_from).days
-    _booking_data = BookingAdd(user_id=user_id, price=boooking_price,  **booking_data.model_dump())
-    await db.bookings.add(_booking_data)
+    _booking_data = BookingAdd(user_id=user_id, price=room.price,  **booking_data.model_dump())
+    booking = await db.bookings.add(_booking_data)
     await db.session.commit()
-    return {"status": "OK", "user_id": user_id}
+    return {"status": "OK", "data": booking}
+
+
+@router.get(path="/bookings")
+async def get_bookings(db: DBDep):
+    bookings = await db.bookings.get_filtered()
+    return {"data": bookings}
+
+
+@router.get(path="/bookings/me")
+async def get_bookings_me(db: DBDep, user_id: UserIdDep):
+    bookings = await db.bookings.get_filtered(user_id=user_id)
+    return {"data": bookings}
