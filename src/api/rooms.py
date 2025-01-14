@@ -32,7 +32,7 @@ async def get_room(
         hotel_id: int,
         room_id: int,
 ):
-    return await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
+    return await db.rooms.get_one_or_none_with(id=room_id, hotel_id=hotel_id)
 
 
 @router.post(
@@ -76,6 +76,8 @@ async def edit_room(
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, id=room_id)
 
+    await db.rooms_facilities.set_rooms_facilities(room_id=room_id, facilities_ids=room_data.facilities_ids)
+
     await db.session.commit()
 
     return {"status": "OK"}
@@ -92,22 +94,14 @@ async def partially_edit_room(
         room_id: int,
         room_data: RoomPatchRequest
 ):
-    _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
+    _room_data_dict = room_data.model_dump(exclude_unset=True)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, id=room_id, hotel_id=hotel_id)
-
-    d = await db.rooms_facilities.get_filtered(room_id=room_id)
-    facilities_exist = set(i.facility_id for i in d)
-    facilities_need = set(room_data.facilities_ids)
-
-    facilities_ids_for_delete = facilities_exist.difference(facilities_need)
-    facilities_ids_for_insert = facilities_need.difference(facilities_exist)
-
-    if facilities_ids_for_delete:
-        for i in facilities_ids_for_delete:
-            await db.rooms_facilities.delete(room_id=room_id, facility_id=i)
-    if facilities_ids_for_insert:
-        rooms_facilities_data_insert = [RoomFacilityAdd(room_id=room_id, facility_id=f_id) for f_id in facilities_ids_for_insert]
-        await db.rooms_facilities.add_bulk(rooms_facilities_data_insert)
+    if "facilities_ids" in _room_data_dict:
+        await db.rooms_facilities.set_rooms_facilities(
+            room_id=room_id,
+            facilities_ids=_room_data_dict["facilities_ids"]
+        )
 
     await db.session.commit()
 

@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert
+from sqlalchemy import delete, insert, select
 
 from src.models.facilities import FacilitiesOrm, RoomsFacilitiesOrm
 from src.repositories.base import BaseRepository
@@ -14,36 +14,33 @@ class RoomsFacilitiesRepository(BaseRepository):
     model = RoomsFacilitiesOrm
     schema = RoomFacility
 
-    # async def edit_bulk(self, data: list[RoomFacility]):
-    #     query = select(self.model).filter_by(**filter_by)
-    #     result = await self.session.execute(query)
-    #     model = result.scalars().one_or_none()
-    #     if model is None:
-    #         return None
-    #     return self.schema.model_validate(model, from_attributes=True)
-    #     smtp = select(self.model).from ()
-    #     for item in data:
-    #         delete(self.model).filter_by(room_id=item.room_id, facility_id=item.facility_id)
-    #     add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
-    #     await self.session.execute(add_data_stmt)
+    async def set_rooms_facilities(self, room_id, facilities_ids: list[int]) -> None:
+        query = select(self.model.facility_id).filter_by(room_id=room_id)
+        res = await self.session.execute(query)
+        current_facilities_ids: list[int] = res.scalars().all()
 
-    # async def edit_bulk(self, data: list[RoomFacility]):
-    #     if not data:
-    #         return
-    #
-    #     # Собираем уникальные room_id и facility_id для удаления
-    #     unique_ids = {(item.room_id, item.facility_id) for item in data}
-    #
-    #     # Удаляем существующие записи
-    #     await self.session.execute(
-    #         delete(self.model).where(
-    #             (self.model.room_id.in_([room_id for room_id, _ in unique_ids])) &
-    #             (self.model.facility_id.in_([facility_id for _, facility_id in unique_ids]))
-    #         )
-    #     )
-    #
-    #     # Подготовляем данные для вставки
-    #     add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
-    #     await self.session.execute(add_data_stmt)
-    #
-    #     await self.session.commit()  # Важно комитить изменения
+        facilities_exist = set(current_facilities_ids)
+        facilities_need = set(facilities_ids)
+
+        facilities_ids_to_delete: list[int] = list(facilities_exist.difference(facilities_need))
+        facilities_ids_to_insert: list[int] = list(facilities_need.difference(facilities_exist))
+
+        if facilities_ids_to_delete:
+            delete_rooms_facilities_stmt = (
+                delete(self.model)
+                .filter(
+                    self.model.room_id == room_id,
+                    self.model.facility_id.in_(facilities_ids_to_delete)
+                )
+            )
+
+            await self.session.execute(delete_rooms_facilities_stmt)
+
+        if facilities_ids_to_insert:
+            insert_rooms_facilities_stmt = (
+                insert(self.model)
+                .values([{"room_id": room_id, "facility_id": f_id} for f_id in facilities_ids_to_insert]
+                )
+            )
+
+            await self.session.execute(insert_rooms_facilities_stmt)
