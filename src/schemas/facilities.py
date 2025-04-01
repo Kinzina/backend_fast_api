@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class FacilitiesAdd(BaseModel):
+class FacilityAdd(BaseModel):
     title: str
 
 

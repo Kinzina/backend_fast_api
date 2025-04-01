@@ -32,7 +32,7 @@ async def get_room(
         hotel_id: int,
         room_id: int,
 ):
-    return await db.rooms.get_one_or_none_with(id=room_id, hotel_id=hotel_id)
+    return await db.rooms.get_one_or_none_reals(id=room_id, hotel_id=hotel_id)
 
 
 @router.post(
@@ -48,6 +48,7 @@ async def create_room(
                 "title": "s", "description": "ss", "price": 10, "quantity": 1, "facilities_ids": [1, 2]
             }}
         })):
+
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
 

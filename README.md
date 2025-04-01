@@ -15,11 +15,8 @@ https://github.com/Kinzina/backend_fast_api/commit/987de27628e03129dfbc0c5b93270
 https://github.com/Kinzina/backend_fast_api/commit/eeaf4ce0b53c3387b1c9c5d5c524373445f802db = task_14
 https://github.com/Kinzina/backend_fast_api/commit/e640024337965c4c11aecf6d5a6fc2b885cb7278 = task_15
 https://github.com/Kinzina/backend_fast_api/commit/4656afab4b0698ec832418dc6d74326444abf603 = task_16
-https://github.com/Kinzina/backend_fast_api/commit/ = task_17
-
-Необходимо получать удобства в ручке для получения конкретного номера.
-Для этого необходимо создать новый метод в репозитории RoomsRepository, 
-который подгрузит удобства через relationship, и вызвать этот метод внутри ручки
+https://github.com/Kinzina/backend_fast_api/commit/1a02443f2d25980b797e7c7bee4e8c004752a735 = task_17
+https://github.com/Kinzina/backend_fast_api/commit/... = task_19
 
 pip install -r requirements.txt
 pip freeze > requirements.txt

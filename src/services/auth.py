@@ -4,9 +4,6 @@ from fastapi import APIRouter, Body, HTTPException, Response
 from passlib.context import CryptContext
 import jwt
 
-from src.schemas.users import UserRequestAdd, UserAdd
-from src.db import async_session_maker
-from src.repositories.users import UsersRepository
 from src.config import settings
 
 
