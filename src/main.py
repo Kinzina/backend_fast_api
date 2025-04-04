@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
+from src.config import settings
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -27,6 +28,9 @@ async def lifespan(app: FastAPI):
     yield
     await redis_manager.close()
     print(2)
+
+# if settings.MODE == 'TEST':
+#     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
 
 
 app = FastAPI(lifespan=lifespan)
